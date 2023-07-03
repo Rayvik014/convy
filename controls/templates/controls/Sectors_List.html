@@ -1,0 +1,9 @@
+{% for sector in Sectors_List %}
+<article>
+    <h3>
+        <a href="{% url 'sectors-detail' Sector.id %}">
+            {{ Sector.sectors }}
+        </a>
+    </h3>
+</article>
+{% endfor %}
