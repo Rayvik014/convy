@@ -2,14 +2,8 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path(
-        "",
-        views.SectorListView.as_view(),
-        name="sectors-list"
-    ),
-    path(
-        "controls/<int:pk>",
-        views.SectorDetailView.as_view(),
-        name="sectors-detail"
-    )
+    path("sectors", views.sectors_list, name="sectors"),
+    path("words", views.words_list, name="words"),
+    path("game", views.game, name="game"),
+    path("", views.index, name="index")
 ]

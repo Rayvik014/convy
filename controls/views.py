@@ -1,17 +1,16 @@
 from django.shortcuts import render
-from django.views.generic import ListView, DetailView
 from .models import Sector, Word
 
-class SectorListView(ListView):
-    model = Sector
-    queryset = Sector.objects.all()
+def sectors_list(request):
+    sectors = Sector.objects.all()
+    return render(request, 'controls/Sectors_List.html', {'sectors': sectors})
 
-class WordListView(ListView):
-    model = Word
-    queryset = Word.objects.all()
+def words_list(request):
+    words = Word.objects.all()
+    return render(request, 'controls/Words_List.html', {'words': words})
 
-class SectorDetailView(DetailView):
-    model = Sector
+def game(request):
+    return render(request, 'controls/Game.html')
 
-class WordDetailView(DetailView):
-    model = Word
+def index(request):
+    return render(request, 'controls/Index.html')
