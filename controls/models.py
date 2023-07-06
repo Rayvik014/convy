@@ -16,8 +16,8 @@ class Word(models.Model):
         return self.lang1
 
 class Progress(models.Model):
-    user_id = models.ForeignKey(User, on_delete=models.CASCADE)
-    word_id = models.ForeignKey(Word, on_delete=models.SET_NULL, null=True)
-    chance = models.ValueRange(start=0.1, end=99.9)
+    user_id = models.PositiveIntegerField(default=0)
+    word_id = models.PositiveSmallIntegerField(default=0)
+    chance = models.PositiveSmallIntegerField(default=50)
 
 
