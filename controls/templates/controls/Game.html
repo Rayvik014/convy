@@ -10,7 +10,17 @@
     {{ message }}
 </form>
 
-{{ random_pick }}
+<br> {{ offered_word  }}
+<br> {{ offered_sector }}
+<br> {{ offered_structure }}
+
+<form action="answer" method="post">
+    {% csrf_token %}
+    <label for="answer">Your Answer:</label>
+    <input id="answer" type="text" name="answer" value="{{ offered_structure }}">
+    <input type="submit" value="OK">
+</form>
+
 
 </body>
 </html>
