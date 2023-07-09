@@ -17,7 +17,9 @@
 <form action="answer" method="post">
     {% csrf_token %}
     <label for="answer">Your Answer:</label>
-    <input id="answer" type="text" name="answer" value="{{ offered_structure }}">
+    <input name="answer" id="answer" type="text" >
+    <input name="offered_answer" type="hidden" value="{{ offered_answer }}" >
+    <input name="offered_id" type="hidden" value="{{ offered_id }}" >
     <input type="submit" value="OK">
 </form>
 

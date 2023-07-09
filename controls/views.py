@@ -4,6 +4,10 @@ from django.http import HttpResponseRedirect
 from .forms import AnswerForm
 import random
 
+# There are constants that increase or decrease value of chance to drop the word:
+CORRECTANSWER = 10 # how to decrease chance for next drop with right answer (def Answer)
+INCORRECTANSWER = 10 # how to increase chance for next drop with right answer (def Answer)
+
 def index(request):
     return render(request, 'controls/Index.html')
 
@@ -47,11 +51,17 @@ def game(request):
     offered_word = offered_object.lang1 if lang == 1 else offered_object.lang2
     offered_sector = offered_object.sector
     offered_structure = make_word_structure(offered_object.lang2) if lang == 1 else make_word_structure(offered_object.lang1)
-    return render(request, 'controls/Game.html', {'offered_word':offered_word,
+    offered_answer = offered_object.lang2 if lang == 1 else offered_object.lang1
+    return render(request, 'controls/Game.html', {'offered_id':random_pick,
+                                                  'offered_answer':offered_answer,
+                                                  'offered_word':offered_word,
                                                   'offered_sector':offered_sector,
                                                   'offered_structure':offered_structure})
 
 def make_word_structure(string):
+    """Function return the structure of word or sentence with underscores like:
+    'fall in love' = '____ __ ____'
+    """
     structure = ""
     for char in string:
         if char != " ":
@@ -61,12 +71,47 @@ def make_word_structure(string):
     return structure
 
 def answer(request):
+    """This functions controls Users answer.
+    It changes value of chance in database depending on the correctness of answer
+    """
     if request.method == 'POST':
         form = AnswerForm(request.POST)
         if form.is_valid():
-            the_answer = form.cleaned_data['answer']
-            print(the_answer)
+            the_answer = form.cleaned_data['answer'].lower()
+            offered_answer = form.cleaned_data['offered_answer'].lower()
+            offered_id = form.cleaned_data['offered_id']
+            progress = Progress.objects.get(word_id=offered_id)
+            if the_answer == offered_answer: # decrease chance value if the answer is correct
+                progress.chance = chance_change(False, CORRECTANSWER, progress.chance)
+                progress.save(update_fields=["chance"])
+                mess = "Correct!"
+            else:                            # increase chance value if the answer is correct
+                progress.chance = chance_change(True, INCORRECTANSWER, progress.chance)
+                progress.save(update_fields=["chance"])
+                mess = "Wrong!"
+        else:
+            print("the form checking is invalid")
         return HttpResponseRedirect('game')
     else:
         form = AnswerForm()
     return render(request, 'game', {'form': form})
+
+def chance_change(plus:bool, value:int, chance:int):
+    """This functions controls the value of chance.
+    It should be from 1 to 99"""
+    if plus == True:
+        for i in range(value):
+            if chance + value >= 100:
+                value -= 1
+            else:
+                chance += value
+                break
+    else:
+        for i in range(value):
+            if chance - value <= 0:
+                value -= 1
+            else:
+                chance -= value
+                break
+    return chance
+
