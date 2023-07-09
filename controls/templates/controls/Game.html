@@ -5,7 +5,8 @@
     <title>Game</title>
 </head>
 <body>
-<form action='PlusOneWord' method="GET">
+<form action='PlusOneWord' method="post">
+    {% csrf_token %}
     <button type="submit" name="plus_one"> Plus one random word</button>
     {{ message }}
 </form>

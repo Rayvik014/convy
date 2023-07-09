@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from .models import Word, Progress
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from .forms import AnswerForm
 import random
 
@@ -43,7 +43,7 @@ def game(request):
     word_chances = Progress.objects.filter(user_id=request.user.id).values_list('chance', flat=True)
     try:
         random_pick = random.choices(user_words, weights=word_chances)[0]
-        # Zero here because random.choices returns a list with one value instead one integer
+        # Zero here because random.choices returns a [list with one value] instead one integer
     except IndexError:
         random_pick = "You have not any words"
     lang = random.choice((1, 2))
@@ -59,7 +59,7 @@ def game(request):
                                                   'offered_structure':offered_structure})
 
 def make_word_structure(string):
-    """Function return the structure of word or sentence with underscores like:
+    """Function returns the structure of word or sentence with underscores like:
     'fall in love' = '____ __ ____'
     """
     structure = ""
@@ -98,20 +98,11 @@ def answer(request):
 
 def chance_change(plus:bool, value:int, chance:int):
     """This functions controls the value of chance.
-    It should be from 1 to 99"""
+    It should be from 1 to 99
+    """
     if plus == True:
-        for i in range(value):
-            if chance + value >= 100:
-                value -= 1
-            else:
-                chance += value
-                break
+        chance = chance + value if chance + value < 100 else 99
     else:
-        for i in range(value):
-            if chance - value <= 0:
-                value -= 1
-            else:
-                chance -= value
-                break
+        chance = chance - value if chance - value > 0 else 1
     return chance
 
