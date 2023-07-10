@@ -1,12 +1,13 @@
 from django.shortcuts import render
 from .models import Word, Progress
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponseRedirect
 from .forms import AnswerForm
+from django.urls import reverse
 import random
 
 # There are constants that increase or decrease value of chance to drop the word:
 CORRECTANSWER = 10 # how to decrease chance for next drop with right answer (def Answer)
-INCORRECTANSWER = 10 # how to increase chance for next drop with right answer (def Answer)
+INCORRECTANSWER = 10 # how to increase chance for next drop with wrong answer (def Answer)
 
 def index(request):
     return render(request, 'controls/Index.html')
@@ -34,13 +35,15 @@ def button_plus_one(request):
             excludes_words.add(random_pick)                              # excludes already dropped picks
             word_ids_list = word_ids_list.exclude(pk__in=excludes_words)
             user_words = user_words.exclude(pk__in=excludes_words)
-    return render(request, 'controls/Game.html', {'message':message})
+    return HttpResponseRedirect(reverse('game') + '?message-from-button=' + message)
 
 def game(request):
     """Function is offer the random Word from User's base for translation, structure of letters and spaces.
     """
     user_words = Progress.objects.filter(user_id=request.user.id).values_list('word_id', flat=True)
     word_chances = Progress.objects.filter(user_id=request.user.id).values_list('chance', flat=True)
+    message_from_button = request.GET.get('message-from-button', '')
+    message_from_answer = request.GET.get('message-from-answer', '')
     try:
         random_pick = random.choices(user_words, weights=word_chances)[0]
         # Zero here because random.choices returns a [list with one value] instead one integer
@@ -52,11 +55,14 @@ def game(request):
     offered_sector = offered_object.sector
     offered_structure = make_word_structure(offered_object.lang2) if lang == 1 else make_word_structure(offered_object.lang1)
     offered_answer = offered_object.lang2 if lang == 1 else offered_object.lang1
-    return render(request, 'controls/Game.html', {'offered_id':random_pick,
-                                                  'offered_answer':offered_answer,
-                                                  'offered_word':offered_word,
-                                                  'offered_sector':offered_sector,
-                                                  'offered_structure':offered_structure})
+    return render(request, 'controls/Game.html', {
+                                    'message_from_answer':message_from_answer,
+                                    'message_from_button':message_from_button,
+                                    'offered_id':random_pick,
+                                    'offered_answer':offered_answer,
+                                    'offered_word':offered_word,
+                                    'offered_sector':offered_sector,
+                                    'offered_structure':offered_structure})
 
 def make_word_structure(string):
     """Function returns the structure of word or sentence with underscores like:
@@ -76,6 +82,7 @@ def answer(request):
     """
     if request.method == 'POST':
         form = AnswerForm(request.POST)
+        mess = "Cant read Input"
         if form.is_valid():
             the_answer = form.cleaned_data['answer'].lower()
             offered_answer = form.cleaned_data['offered_answer'].lower()
@@ -89,12 +96,10 @@ def answer(request):
                 progress.chance = chance_change(True, INCORRECTANSWER, progress.chance)
                 progress.save(update_fields=["chance"])
                 mess = "Wrong!"
-        else:
-            print("the form checking is invalid")
-        return HttpResponseRedirect('game')
+        return HttpResponseRedirect(reverse('game') + '?message-from-answer=' + mess)
     else:
         form = AnswerForm()
-    return render(request, 'game', {'form': form})
+    return render(request, 'controls/Game.html', {'form': form})
 
 def chance_change(plus:bool, value:int, chance:int):
     """This functions controls the value of chance.

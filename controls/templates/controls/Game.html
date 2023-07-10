@@ -5,10 +5,10 @@
     <title>Game</title>
 </head>
 <body>
-<form action='PlusOneWord' method="post">
+<form action='PlusOneWord' method="get">
     {% csrf_token %}
     <button type="submit" name="plus_one"> Plus one random word</button>
-    {{ message }}
+    {{ message_from_button }}
 </form>
 
 <br> {{ offered_word  }}
@@ -22,8 +22,8 @@
     <input name="offered_answer" type="hidden" value="{{ offered_answer }}" >
     <input name="offered_id" type="hidden" value="{{ offered_id }}" >
     <input type="submit" value="OK">
+    {{ message_from_answer }}
 </form>
-
 
 </body>
 </html>
