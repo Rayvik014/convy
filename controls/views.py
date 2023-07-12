@@ -92,7 +92,7 @@ def answer(request):
                 progress.chance = chance_change(False, CORRECTANSWER, progress.chance)
                 progress.save(update_fields=["chance"])
                 mess = "Correct!"
-            else:                            # increase chance value if the answer is correct
+            else:                            # increase chance value if the answer is incorrect
                 progress.chance = chance_change(True, INCORRECTANSWER, progress.chance)
                 progress.save(update_fields=["chance"])
                 mess = "Wrong!"

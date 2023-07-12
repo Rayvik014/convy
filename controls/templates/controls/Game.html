@@ -1,29 +1,25 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Game</title>
-</head>
-<body>
-<form action='PlusOneWord' method="get">
-    {% csrf_token %}
-    <button type="submit" name="plus_one"> Plus one random word</button>
-    {{ message_from_button }}
-</form>
+{% extends "controls/base.html" %}
 
-<br> {{ offered_word  }}
-<br> {{ offered_sector }}
-<br> {{ offered_structure }}
+{% block left %}
+    <form action='PlusOneWord' method="get">
+        {% csrf_token %}
+        <button type="submit" name="plus_one"> Plus one random word</button>
+        {{ message_from_button }}
+    </form>
+{% endblock %}
 
-<form action="answer" method="post">
-    {% csrf_token %}
-    <label for="answer">Your Answer:</label>
-    <input name="answer" id="answer" type="text" >
-    <input name="offered_answer" type="hidden" value="{{ offered_answer }}" >
-    <input name="offered_id" type="hidden" value="{{ offered_id }}" >
-    <input type="submit" value="OK">
-    {{ message_from_answer }}
-</form>
+{% block center %}
+    <br> {{ offered_word  }}
+    <br> {{ offered_sector }}
+    <br> {{ offered_structure }}
 
-</body>
-</html>
+    <form action="answer" method="post">
+        {% csrf_token %}
+        <label for="answer">Your Answer:</label>
+        <input name="answer" id="answer" type="text" >
+        <input name="offered_answer" type="hidden" value="{{ offered_answer }}" >
+        <input name="offered_id" type="hidden" value="{{ offered_id }}" >
+        <input type="submit" value="OK">
+        {{ message_from_answer }}
+    </form>
+{% endblock %}

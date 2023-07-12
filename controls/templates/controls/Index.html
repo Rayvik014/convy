@@ -1,16 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Authorization</title>
-</head>
-<body>
-Index Page
-{% if user.is_authenticated %}
-    <p>Hello, {{ user }} </p>
-    <p>If you want to exit, just click <a href="{% url 'logout' %}">here</a></p>
-{% else %}
-    <p><a href="{% url 'login' %}">Click here to Log In</a></p>
-{% endif %}
-</body>
-</html>
+{% extends "controls/base.html" %}
+
+{% block head_right %}
+    {% if user.is_authenticated %}
+        <p>Hello, {{ user }} </p>
+        <p>If you want to exit, just click <a href="{% url 'logout' %}">here</a></p>
+    {% else %}
+        <p><a href="{% url 'login' %}">Click here to Log In</a></p>
+    {% endif %}
+{% endblock %}
