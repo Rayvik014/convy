@@ -12,29 +12,41 @@ INCORRECTANSWER = 10 # how to increase chance for next drop with wrong answer (d
 def index(request):
     return render(request, 'controls/Index.html')
 
-def button_plus_one(request):
+def button_plus_word(user_id, count_of_words):
     """This script for button adds one new learning word for user.
     It takes random word from Word base, checks is this word unique for User,
     and makes a record in Progress Database with User ID, Word ID, and Chance
     """
-    # QuerySet of All words in Base:
-    word_ids_list = Word.objects.values_list('pk', flat=True)
-    # QuerySet of All words of current User:
-    user_words = Progress.objects.filter(user_id=request.user.id).values_list('word_id', flat=True)
-    message = "Sorry, we haven't new words for you, please try later"
-    excludes_words = set()
-    while len(word_ids_list) > 0:
-        random_pick = random.choice(word_ids_list)                      #Choose random word ID
-        if random_pick not in user_words:
-            p = Progress(user_id=request.user.id, word_id=random_pick)  #Write the new string in database
-            p.save()
-            word_obj = Word.objects.get(pk=random_pick)
-            message = f"The Word {word_obj.lang1}/{word_obj.lang2} added"
-            break
-        else:
-            excludes_words.add(random_pick)                              # excludes already dropped picks
-            word_ids_list = word_ids_list.exclude(pk__in=excludes_words)
-            user_words = user_words.exclude(pk__in=excludes_words)
+    message, message2 = "", ""
+    for i in range(count_of_words):
+        # QuerySet of All words in Base:
+        word_ids_list = Word.objects.values_list('pk', flat=True)
+        # QuerySet of All words of current User:
+        user_words = Progress.objects.filter(user_id=user_id).values_list('word_id', flat=True)
+        excludes_words = set()
+        while len(word_ids_list) > 0:
+            random_pick = random.choice(word_ids_list)  # Choose random word ID
+            if random_pick not in user_words:
+                p = Progress(user_id=user_id, word_id=random_pick)  # Write the new string in database
+                p.save()
+                word_obj = Word.objects.get(pk=random_pick)
+                message2 += f"The word added: {word_obj.lang1}/{word_obj.lang2}\n"
+                break
+            else:
+                excludes_words.add(random_pick)  # excludes already dropped picks
+                word_ids_list = word_ids_list.exclude(pk__in=excludes_words)
+                user_words = user_words.exclude(pk__in=excludes_words)
+    message = "Sorry, we haven't new words for you, please try later" if message2 == "" else message2
+    return message
+
+def button_plus_one(request):
+    user_id = request.user.id
+    message = button_plus_word(user_id, 1)
+    return HttpResponseRedirect(reverse('game') + '?message-from-button=' + message)
+
+def button_plus_ten(request):
+    user_id = request.user.id
+    message = button_plus_word(user_id, 10)
     return HttpResponseRedirect(reverse('game') + '?message-from-button=' + message)
 
 def game(request):
@@ -46,11 +58,14 @@ def game(request):
     word_chances = Progress.objects.filter(user_id=request.user.id).values_list('chance', flat=True)
     message_from_button = request.GET.get('message-from-button', '')
     message_from_answer = request.GET.get('message-from-answer', '')
+    words_in_dictionary = str(len(user_words)) + "/" + str(Word.objects.count())
     try:
         random_pick = random.choices(user_words, weights=word_chances)[0]
         # Zero here because random.choices returns a [list with one value] instead one integer
     except IndexError:
         message_from_answer = "You have not any words"
+        return render(request, 'controls/Game.html', {'message_from_answer':message_from_answer,
+                                                      'words_in_dictionary':words_in_dictionary})
     lang = random.choice((1, 2))
     offered_object = Word.objects.get(id=random_pick)
     offered_word = offered_object.lang1 if lang == 1 else offered_object.lang2
@@ -58,6 +73,7 @@ def game(request):
     offered_structure = make_word_structure(offered_object.lang2) if lang == 1 else make_word_structure(offered_object.lang1)
     offered_answer = offered_object.lang2 if lang == 1 else offered_object.lang1
     return render(request, 'controls/Game.html', {
+                                    'words_in_dictionary':words_in_dictionary,
                                     'message_from_answer':message_from_answer,
                                     'message_from_button':message_from_button,
                                     'offered_id':random_pick,

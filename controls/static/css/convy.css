@@ -1,8 +1,9 @@
 :root {
-    --color1: #FF9200; /* yellow bright */
-    --color2: #FFC373; /* yellow light */
-    --color3: #0B61A4; /* blue */
+    --color1: #FFB473; /* bright */
+    --color2: #FF9840; /* light */
+    --color3: #A64D00; /* dark */
     }
+
 .color1 {
     color: var(--color1)
 }
@@ -13,14 +14,39 @@
     color: var(--color3)
 }
 
+.btn-primary{
+    background-color: var(--color2) !important;
+    border-color: var(--color1) !important;
+    width:100%;
+}
+.btn-primary:hover{
+    background-color: var(--color1) !important;
+    border-color: var(--color1) !important;
+}
+.btn-primary:active{
+    background-color: var(--color1) !important;
+    border-color: var(--color1) !important;
+}
+btn-primary:visited{
+    background-color: var(--color2) !important;
+    border-color: var(--color1) !important;
+}
+
+
+
 header, footer {
     padding: 5px 0;
     }
 header {
-    background: rgb(255,146,0);
-    background: linear-gradient(180deg, rgba(255,146,0,1) 0%, rgba(255,195,115,1) 74%);
+    background: var(--color1);
+    background: linear-gradient(180deg, var(--color1) 0%, var(--color2) 74%);
     }
 footer {
-    background: rgb(255,146,0);
-    background: linear-gradient(0deg, rgba(255,146,0,1) 0%, rgba(255,195,115,1) 74%);
+    position: fixed;
+    width: 100%;
+    right: 0;
+    bottom: 0;
+    text-align: center;
+    background: var(--color1);
+    background: linear-gradient(0deg, var(--color1) 0%, var(--color2) 74%);
     }

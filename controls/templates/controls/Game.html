@@ -1,14 +1,18 @@
 {% extends "controls/base.html" %}
 
 {% block left %}
+    <h6> Total words in dictionary {{ words_in_dictionary }}</h6>
     <form action='PlusOneWord' method="get">
-        {% csrf_token %}
-        <button type="submit" name="plus_one"> Plus one random word</button>
-        {{ message_from_button }}
+        <button type="submit" name="plus_one" class="btn btn-primary"> +1 word</button>
+    </form>
+    <form action='PlusTenWords' method="get">
+        <button type="submit" name="plus_ten" class="btn btn-primary"> +10 words</button>
     </form>
 {% endblock %}
 
 {% block center %}
+    {{ message_from_button|linebreaks }}
+
     <br> {{ offered_word  }}
     <br> {{ offered_sector }}
     <br> {{ offered_structure }}
