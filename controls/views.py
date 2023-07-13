@@ -40,6 +40,8 @@ def button_plus_one(request):
 def game(request):
     """Function is offer the random Word from User's base for translation, structure of letters and spaces.
     """
+    if not request.user.is_authenticated:
+        return HttpResponseRedirect(reverse('index'))
     user_words = Progress.objects.filter(user_id=request.user.id).values_list('word_id', flat=True)
     word_chances = Progress.objects.filter(user_id=request.user.id).values_list('chance', flat=True)
     message_from_button = request.GET.get('message-from-button', '')
@@ -48,7 +50,7 @@ def game(request):
         random_pick = random.choices(user_words, weights=word_chances)[0]
         # Zero here because random.choices returns a [list with one value] instead one integer
     except IndexError:
-        random_pick = "You have not any words"
+        message_from_answer = "You have not any words"
     lang = random.choice((1, 2))
     offered_object = Word.objects.get(id=random_pick)
     offered_word = offered_object.lang1 if lang == 1 else offered_object.lang2

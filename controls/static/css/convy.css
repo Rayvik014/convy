@@ -1,0 +1,26 @@
+:root {
+    --color1: #FF9200; /* yellow bright */
+    --color2: #FFC373; /* yellow light */
+    --color3: #0B61A4; /* blue */
+    }
+.color1 {
+    color: var(--color1)
+}
+.color2 {
+    color: var(--color2)
+}
+.color3 {
+    color: var(--color3)
+}
+
+header, footer {
+    padding: 5px 0;
+    }
+header {
+    background: rgb(255,146,0);
+    background: linear-gradient(180deg, rgba(255,146,0,1) 0%, rgba(255,195,115,1) 74%);
+    }
+footer {
+    background: rgb(255,146,0);
+    background: linear-gradient(0deg, rgba(255,146,0,1) 0%, rgba(255,195,115,1) 74%);
+    }
