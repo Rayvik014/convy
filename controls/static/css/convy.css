@@ -32,6 +32,13 @@
     border-color: var(--color1) !important;
 }
 
+.form-control {
+    text-align: center !important;
+    letter-spacing: 5px !important;
+    word-spacing: 10px !important;
+}
+
+
 header, footer {
     padding: 5px 0;
     }

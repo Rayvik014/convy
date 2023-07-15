@@ -6,8 +6,8 @@ from django.urls import reverse
 import random
 
 # There are constants that increase or decrease value of chance to drop the word:
-CORRECTANSWER = 10 # how to decrease chance for next drop with right answer (def Answer)
-INCORRECTANSWER = 10 # how to increase chance for next drop with wrong answer (def Answer)
+CORRECTANSWER = 7 # how to decrease chance for next drop with right answer (def Answer)
+INCORRECTANSWER = 7 # how to increase chance for next drop with wrong answer (def Answer)
 
 def index(request):
     return render(request, 'controls/Index.html')
@@ -36,7 +36,7 @@ def button_plus_word(user_id, count_of_words):
                 excludes_words.add(random_pick)  # excludes already dropped picks
                 word_ids_list = word_ids_list.exclude(pk__in=excludes_words)
                 user_words = user_words.exclude(pk__in=excludes_words)
-    message = "Sorry, we haven't new words for you, please try later" if message2 == "" else message2
+    message = "No more words for you" if message2 == "" else message2
     return message
 
 def button_plus_one(request):
@@ -77,7 +77,7 @@ def game(request):
     for x,y in enumerate(user_words):
         if y == random_pick:
             learning_progress = word_chances[x]
-    learning_progress = (-1)*learning_progress + 100 #invert the value
+    learning_progress = (-1)*learning_progress + 101 #invert the value
     return render(request, 'controls/Game.html', {
                                     'words_in_dictionary':words_in_dictionary,
                                     'message_from_answer':message_from_answer,
@@ -90,15 +90,12 @@ def game(request):
                                     'learning_progress':learning_progress})
 
 def make_word_structure(string):
-    """Function returns the structure of word or sentence with underscores like:
-    'fall in love' = '____ __ ____'
+    """Function returns the structure of word or sentence with minuses like:
+    'fall in love' = '---- -- ----'
     """
     structure = ""
     for char in string:
-        if char != " ":
-            structure += "_"
-        else:
-            structure += char
+        structure += "-" if char != " " else char
     return structure
 
 def answer(request):
@@ -131,8 +128,8 @@ def chance_change(plus:bool, value:int, chance:int):
     It should be from 1 to 99
     """
     if plus == True:
-        chance = chance + value if chance + value < 100 else 99
+        chance = chance + value if chance + value < 99 else 99
     else:
-        chance = chance - value if chance - value > 0 else 1
+        chance = chance - value if chance - value > 1 else 1
     return chance
 
