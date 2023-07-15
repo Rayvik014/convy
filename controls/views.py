@@ -72,6 +72,12 @@ def game(request):
     offered_sector = offered_object.sector
     offered_structure = make_word_structure(offered_object.lang2) if lang == 1 else make_word_structure(offered_object.lang1)
     offered_answer = offered_object.lang2 if lang == 1 else offered_object.lang1
+    learning_progress = 1
+    # QuerySet hasn't method .index, so using this construction for find value by index:
+    for x,y in enumerate(user_words):
+        if y == random_pick:
+            learning_progress = word_chances[x]
+    learning_progress = (-1)*learning_progress + 100 #invert the value
     return render(request, 'controls/Game.html', {
                                     'words_in_dictionary':words_in_dictionary,
                                     'message_from_answer':message_from_answer,
@@ -80,7 +86,8 @@ def game(request):
                                     'offered_answer':offered_answer,
                                     'offered_word':offered_word,
                                     'offered_sector':offered_sector,
-                                    'offered_structure':offered_structure})
+                                    'offered_structure':offered_structure,
+                                    'learning_progress':learning_progress})
 
 def make_word_structure(string):
     """Function returns the structure of word or sentence with underscores like:

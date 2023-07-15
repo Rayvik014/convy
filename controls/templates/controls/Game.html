@@ -11,19 +11,37 @@
 {% endblock %}
 
 {% block center %}
-    {{ message_from_button|linebreaks }}
+    <table>
+        <tr><td>
+            <br><h6 class="text-center text-uppercase color3"> {{ message_from_button|linebreaks }} </h6>
+        </td></tr>
+        <tr><td>
+            <br><br><h2 class="text-center text-uppercase color2"> {{ offered_word  }} </h2>
+        </td></tr>
+        <tr><td>
+            <h6 class="text-center text-uppercase color1"> {{ offered_sector }} </h6>
+        </td></tr>
+        <tr><td>
+            <br>
+            <div class="progress" role="progressbar" aria-label="Animated striped example" aria-valuenow="50" aria-valuemin="1" aria-valuemax="99">
+                <div class="progress-bar progress-bar-striped progress-bar-animated" style="width: {{learning_progress}}%; background-color:var(--color2) !important "> {{learning_progress}}% </div>
+            </div>
+        </td></tr>
+        <tr><td>
+            <br><br> {{ offered_structure }}
 
-    <br> {{ offered_word  }}
-    <br> {{ offered_sector }}
-    <br> {{ offered_structure }}
-
-    <form action="answer" method="post">
-        {% csrf_token %}
-        <label for="answer">Your Answer:</label>
-        <input name="answer" id="answer" type="text" >
-        <input name="offered_answer" type="hidden" value="{{ offered_answer }}" >
-        <input name="offered_id" type="hidden" value="{{ offered_id }}" >
-        <input type="submit" value="OK">
-        {{ message_from_answer }}
-    </form>
+            <form action="answer" method="post">
+                {% csrf_token %}
+                <label for="answer">Your Answer:</label>
+                <input name="answer" id="answer" type="text" >
+                <input name="offered_answer" type="hidden" value="{{ offered_answer }}" >
+                <input name="offered_id" type="hidden" value="{{ offered_id }}" >
+                <input type="submit" value="OK">
+            </form>
+        </td></tr>
+        <tr><td>
+            <br>
+            <h6 class="text-center text-uppercase color3"> {{ message_from_answer }} </h6>
+        </td></tr>
+    </table>
 {% endblock %}

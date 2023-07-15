@@ -27,12 +27,10 @@
     background-color: var(--color1) !important;
     border-color: var(--color1) !important;
 }
-btn-primary:visited{
+.btn-primary:visited{
     background-color: var(--color2) !important;
     border-color: var(--color1) !important;
 }
-
-
 
 header, footer {
     padding: 5px 0;
