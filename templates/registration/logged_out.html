@@ -1,5 +1,11 @@
-{% block content %}
-<p>Logged out!</p>
+{% extends "controls/base.html" %}
 
-<a href="{% url 'login'%}">Click here to login again.</a>
+{% block center %}
+<br><br>
+<p align="center">Вы вышли из аккаунта</p>
+<br><br>
+<p align="center"><a class="color3" href={% url 'login' %}>Нажмите сюда чтобы залогиниться снова</a></p>
+<br><br>
+<p align="center"><a class="color3" href={% url 'index' %}>Главная</a></p>
+
 {% endblock %}

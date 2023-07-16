@@ -1,12 +1,19 @@
 {% extends "controls/base.html" %}
 
+{% block head_right %}
+    <p class="color3" align="right"><small> Выполнен вход: {{ user }}. <a class="color3" href="{% url 'logout' %}"> <br> Нажмите чтобы выйти </small></a></p>
+{% endblock %}
+
 {% block left %}
-    <h6> Total words in dictionary {{ words_in_dictionary }}</h6>
+    <br>
+    <h6 class="color3"> Всего слов в словаре: <br>{{ words_in_dictionary }}</h6>
+    <br>
     <form action='PlusOneWord' method="get">
-        <button type="submit" name="plus_one" class="btn btn-primary"> +1 word</button>
+        <button type="submit" name="plus_one" class="btn btn-primary">Добавить +1 слово</button>
     </form>
+    <br>
     <form action='PlusTenWords' method="get">
-        <button type="submit" name="plus_ten" class="btn btn-primary"> +10 words</button>
+        <button type="submit" name="plus_ten" class="btn btn-primary">Добавить +10 слов</button>
     </form>
 {% endblock %}
 
@@ -32,7 +39,7 @@
             <form action="answer" method="post">
                 {% csrf_token %}
                 <div class="form-floating mb-3">
-                <input name="answer" class="form-control" type="text" id="AnswerInput" placeholder={{offered_structure}} autofocus>
+                <input name="answer" class="form-control" type="text" id="AnswerInput" style="text-align: center !important; letter-spacing: 5px !important; word-spacing: 10px !important;" placeholder={{offered_structure}} autofocus>
                 <label for="AnswerInput" style="width: 100%; text-align: center !important; letter-spacing: 5px !important; word-spacing: 10px !important;">{{offered_structure}}</label>
                 </div>
                 <input name="offered_answer" type="hidden" value="{{ offered_answer }}" >
@@ -46,4 +53,16 @@
             <h6 class="text-center text-uppercase color3"> {{ message_from_answer }} </h6>
         </td></tr>
     </table>
+{% endblock %}
+
+{% block right %}
+    <br>
+    <h6 class="color3"> Изучено в категориях: </h6>
+    <br>
+    {% for key, value in sector_statistics.items %}
+        <h6 class="color3"> {{ key }} </h6>
+        <div class="progress" role="progressbar" aria-label="Animated striped example" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100">
+            <div class="progress-bar progress-bar-striped progress-bar-animated" style="width: {{value}}%; background-color:var(--color2) !important "> {{value}}% </div>
+        </div>
+    {% endfor %}
 {% endblock %}

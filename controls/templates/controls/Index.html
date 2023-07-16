@@ -2,9 +2,38 @@
 
 {% block head_right %}
     {% if user.is_authenticated %}
-        <p>Hello, {{ user }} </p>
-        <p>If you want to exit, just click <a href="{% url 'logout' %}">here</a></p>
+        <p>Привет, {{ user }}! </p>
+        <p align="right" class="color3"><small>Для выхода нажми <a class="color3" href="{% url 'logout' %}">сюда</a></small></p>
     {% else %}
-        <p><a href="{% url 'login' %}">Click here to Log In</a></p>
+        <p align="right" class="color3"><small><a class="color3" href="{% url 'login' %}">Вход</a> или Регистрация</small></p>
     {% endif %}
+{% endblock %}
+
+
+{% block center %}
+    <br><br><br><br><br>
+    <h3 align="center" class="color2">Авторизация</h3>
+    <br>
+    {% if form.errors %}
+        <p align="center" class="color3">Имя пользователя или пароль неверные, попробуйте снова</p>
+    {% endif %}
+
+    <form action={% url 'login' %} method="post">
+        {% csrf_token %}
+        <div class="form-floating mb-3">
+            <input type="email" class="form-control" id="EmailValue" placeholder="Адрес электронной почты">
+            <label for="EmailValue">Адрес электронной почты</label>
+        </div>
+        <div class="form-floating mb-3">
+            <input name="answer" class="form-control" type="text" id="PasswordValue" placeholder="Password123">
+            <label for="PasswordValue">Пароль</label>
+        </div>
+        <button type="submit" value="OK" class="btn btn-primary mb-3"> OK </button>
+        <input type="hidden" name="next" value="{{ next }}"
+     </form>
+
+    {# Assumes you setup the password_reset view in your URLconf #}
+    <p><a href="{% url 'password_reset' %}">Забыли пароль?</a></p>
+
+
 {% endblock %}
