@@ -1,9 +1,11 @@
 from django.shortcuts import render
 from .models import Word, Progress
-from django.http import HttpResponseRedirect
-from .forms import AnswerForm
+from django.http import HttpResponseRedirect, HttpResponse
+from .forms import AnswerForm, LoginForm
 from django.urls import reverse
 import random
+from django.contrib.auth import get_user_model, login, logout
+from django.contrib.auth.backends import ModelBackend
 
 # There are constants that increase or decrease value of chance to drop the word:
 CORRECTANSWER = 7 # how to decrease chance for next drop with right answer (def Answer)
@@ -11,7 +13,16 @@ INCORRECTANSWER = 7 # how to increase chance for next drop with wrong answer (de
 CHANCEONSTART = 80 # chance for drop with new words creates (inverted value is percent of learning)
 
 def index(request):
-    return render(request, 'controls/Index.html')
+    message_auth = request.GET.get('message-auth', '')
+    words_in_dict = str(Progress.objects.count()) + "/" + str(Word.objects.count())
+    percent_of_learning = 0
+    percents = Progress.objects.values_list('chance', flat=True)
+    for x,y in enumerate(percents):
+        percent_of_learning += y
+    percent_of_learning = inverse_percentage(percent_of_learning // (x + 1))
+    return render(request, 'controls/Index.html', {'message_auth':message_auth,
+                                                   'words_in_dict':words_in_dict,
+                                                   'percent_of_learning':percent_of_learning})
 
 def button_plus_word(user_id, count_of_words):
     """This script for button adds one new learning word for user.
@@ -158,7 +169,7 @@ def answer(request):
         return HttpResponseRedirect(reverse('game') + '?message-from-answer=' + mess)
     else:
         form = AnswerForm()
-    return render(request, 'controls/Game.html', {'form': form})
+        return render(request, 'controls/Game.html', {'form': form})
 
 def chance_change(plus:bool, value:int, chance:int):
     """This functions controls the value of chance.
@@ -170,3 +181,40 @@ def chance_change(plus:bool, value:int, chance:int):
         chance = chance - value if chance - value > 1 else 1
     return chance
 
+class EmailBackend(ModelBackend):
+    """This class replaces standard ModelBackend class and uses Email for authorization instead name"""
+    def authenticate(self, request, username=None, password=None, **kwargs):
+        UserModel = get_user_model()
+        try:
+            user = UserModel.objects.get(email=username)
+        except UserModel.DoesNotExist:
+            return None
+        else:
+            if user.check_password(password):
+                return user
+        return None
+
+def my_login(request):
+    message = "Введите адрес электронной почты и пароль"
+    if request.method == 'POST':
+        form = LoginForm(request.POST)
+        if form.is_valid():
+            user = EmailBackend().authenticate(request, username=form.cleaned_data['email_value'],
+                                                        password=form.cleaned_data['password_value'])
+            if user is not None:
+                if user.is_active:
+                    login(request, user)
+                else:
+                    message = "Аккаунт заблокирован"
+            else:
+                message = "Неправильный адрес электронной почты или пароль"
+        return HttpResponseRedirect(reverse('index') + '?message-auth=' + message)
+    else:
+        form = LoginForm()
+        return render(request, 'controls/Index.html', {'form': form})
+
+
+def my_logout(request):
+    logout(request)
+    message = "Выход выполнен"
+    return HttpResponseRedirect(reverse('index') + '?message-auth=' + message)
