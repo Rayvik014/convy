@@ -1,5 +1,9 @@
 {% extends "controls/base.html" %}
 
+{% block title %}
+    <title>Convy</title>
+{% endblock %}
+
 {% block head_right %}
     <p class="color3" align="right"><small> Выполнен вход: {{ user }}. <a class="color3" href="{% url 'logout' %}"> <br> Нажмите чтобы выйти </small></a></p>
 {% endblock %}

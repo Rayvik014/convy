@@ -1,11 +1,13 @@
 {% extends "controls/base.html" %}
 
+{% block title %}
+    <title>Convy - Выход</title>
+{% endblock %}
+
 {% block center %}
 <br><br>
-<p align="center">Вы вышли из аккаунта</p>
-<br><br>
-<p align="center"><a class="color3" href={% url 'login' %}>Нажмите сюда чтобы залогиниться снова</a></p>
-<br><br>
-<p align="center"><a class="color3" href={% url 'index' %}>Главная</a></p>
-
+<p align="center">Вы вышли из аккаунта, сейчас вы будете перемещены на главную страницу</p>
+<meta http-equiv="refresh" content="4;url={% url 'index' %}" />
+<br>
+<small><p align="center" ><a class="color3" href="{% url 'index' %}">Нажмите для немедленного перехода</a></p></small>
 {% endblock %}

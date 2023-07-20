@@ -1,5 +1,9 @@
 {% extends "controls/base.html" %}
 
+{% block title %}
+    <title>Convy - Главная</title>
+{% endblock %}
+
 {% block head_right %}
     {% if user.is_authenticated %}
         <p align="right" class="color3"><small>Для выхода нажми <a class="color3" href="{% url 'logout' %}">сюда</a></small></p>
@@ -36,9 +40,11 @@
             </div>
             <button type="submit" value="OK" class="btn btn-primary mb-3"> OK </button>
         </form>
-        {{ message_auth }}
-        {# Assumes you setup the password_reset view in your URLconf #}
-        <p><a href="{% url 'password_reset' %}">Забыли пароль?</a></p>
+        <p align="center" class="color2"> {{ message_auth }} </p>
+        <br>
+        <p align="center" ><a class="color3" href="{% url 'password_reset' %}">Забыли пароль?</a></p>
+        <p align="center" ><a class="color3" href="{% url 'registration' %}">Регистрация</a></p>
+
     {% endif %}
 
 {% endblock %}

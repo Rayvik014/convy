@@ -7,7 +7,8 @@ urlpatterns = [
     path("game/PlusOneWord", views.button_plus_one, name="PlusOneWord"),
     path("game/PlusTenWords", views.button_plus_ten, name="PlusTenWords"),
     path("game/answer", views.answer, name="answer"),
-    path("login/", views.my_login, name='login'),
-    path("logout/", views.my_logout, name='logout'),
+    path("login/", views.my_login, name="login"),
+    path("logout/", views.my_logout, name="logout"),
+    path("registration/", views.registration, name="registration")
 
 ]

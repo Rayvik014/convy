@@ -1,7 +1,7 @@
 from django.shortcuts import render
-from .models import Word, Progress
+from .models import Word, Progress, User
 from django.http import HttpResponseRedirect, HttpResponse
-from .forms import AnswerForm, LoginForm
+from .forms import AnswerForm, LoginForm, RegistrationForm
 from django.urls import reverse
 import random
 from django.contrib.auth import get_user_model, login, logout
@@ -199,7 +199,7 @@ def my_login(request):
     if request.method == 'POST':
         form = LoginForm(request.POST)
         if form.is_valid():
-            user = EmailBackend().authenticate(request, username=form.cleaned_data['email_value'],
+            user = EmailBackend().authenticate(request, username=form.cleaned_data['email_value'].lower(),
                                                         password=form.cleaned_data['password_value'])
             if user is not None:
                 if user.is_active:
@@ -216,5 +216,27 @@ def my_login(request):
 
 def my_logout(request):
     logout(request)
-    message = "Выход выполнен"
-    return HttpResponseRedirect(reverse('index') + '?message-auth=' + message)
+    return HttpResponseRedirect(reverse('index'))
+
+def registration(request):
+    message = ""
+    if request.method == 'POST':
+        form = RegistrationForm(request.POST)
+        if form.is_valid():
+            user_name = form.cleaned_data['user_name']
+            user_email = form.cleaned_data['user_email'].lower()
+            user_password_1 = form.cleaned_data['user_password_1']
+            user_password_2 = form.cleaned_data['user_password_2']
+            if user_password_1 == user_password_2:
+                User.objects.create_user(user_name, user_email, user_password_1)
+                user = EmailBackend().authenticate(request, username=user_email,
+                                                            password=user_password_1)
+                login(request, user)
+                return HttpResponseRedirect(reverse('index'))
+            else:
+                message = "Пароли не совпадают, попробуйте снова!"
+        else:
+            message = "Необходимые поля не заполнены, попробуйте еще раз"
+    form = RegistrationForm()
+    return render(request, 'registration/registration.html', {'form': form,
+                                                              'message':message})
