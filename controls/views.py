@@ -1,11 +1,12 @@
-from django.shortcuts import render
-from .models import Word, Progress, User
-from django.http import HttpResponseRedirect, HttpResponse
-from .forms import AnswerForm, LoginForm, RegistrationForm
-from django.urls import reverse
-import random
-from django.contrib.auth import get_user_model, login, logout
 from django.contrib.auth.backends import ModelBackend
+from django.contrib.auth.models import User, Group
+from django.contrib.auth import get_user_model, login, logout
+from django.shortcuts import render
+from django.http import HttpResponseRedirect
+from django.urls import reverse
+from .models import Word, Progress
+from .forms import AnswerForm, LoginForm, RegistrationForm
+import random
 
 # There are constants that increase or decrease value of chance to drop the word:
 CORRECTANSWER = 7 # how to decrease chance for next drop with right answer (def Answer)
@@ -13,13 +14,15 @@ INCORRECTANSWER = 7 # how to increase chance for next drop with wrong answer (de
 CHANCEONSTART = 80 # chance for drop with new words creates (inverted value is percent of learning)
 
 def index(request):
+    user_id = request.user.id
     message_auth = request.GET.get('message-auth', '')
-    words_in_dict = str(Progress.objects.count()) + "/" + str(Word.objects.count())
+    words_in_dict = str(Progress.objects.filter(user_id=user_id).count()) + "/" + str(Word.objects.count())
     percent_of_learning = 0
-    percents = Progress.objects.values_list('chance', flat=True)
-    for x,y in enumerate(percents):
-        percent_of_learning += y
-    percent_of_learning = inverse_percentage(percent_of_learning // (x + 1))
+    percents = Progress.objects.filter(user_id=user_id).values_list('chance', flat=True)
+    if percents:
+        for x,y in enumerate(percents):
+            percent_of_learning += y
+        percent_of_learning = inverse_percentage(percent_of_learning // (x + 1))
     return render(request, 'controls/Index.html', {'message_auth':message_auth,
                                                    'words_in_dict':words_in_dict,
                                                    'percent_of_learning':percent_of_learning})
@@ -228,15 +231,20 @@ def registration(request):
             user_password_1 = form.cleaned_data['user_password_1']
             user_password_2 = form.cleaned_data['user_password_2']
             if user_password_1 == user_password_2:
-                User.objects.create_user(user_name, user_email, user_password_1)
-                user = EmailBackend().authenticate(request, username=user_email,
+                if user_email not in User.objects.values_list('email', flat=True):
+                    User.objects.create_user(user_name, user_email, user_password_1)
+                    user = EmailBackend().authenticate(request, username=user_email,
                                                             password=user_password_1)
-                login(request, user)
-                return HttpResponseRedirect(reverse('index'))
+                    group = Group.objects.get(name="Gamers")
+                    user.groups.add(group)
+                    login(request, user)
+                    return HttpResponseRedirect(reverse('index'))
+                else:
+                    message = "Пользователь с такой электронной почтой уже зарегистрирован!"
             else:
                 message = "Пароли не совпадают, попробуйте снова!"
         else:
-            message = "Необходимые поля не заполнены, попробуйте еще раз"
+            message = form.errors
     form = RegistrationForm()
     return render(request, 'registration/registration.html', {'form': form,
                                                               'message':message})

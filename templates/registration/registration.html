@@ -11,7 +11,7 @@
         <br><br><br><br><br>
         <h3 align="center" class="color2">Регистрация</h3>
         <br>
-        <form class="requires-validation" action="registration/" method="post" novalidate>
+        <form class="needs-validation" action="reg_button" method="post" novalidate>
             {% csrf_token %}
             <div class="form-floating mb-3">
                 <input name="user_name" type="text" class="form-control" id="user_name" placeholder="Адрес электронной почты" required>
@@ -39,6 +39,22 @@
             </div>
             <button type="submit" value="OK" class="btn btn-primary mb-3"> Зарегистрироваться </button>
             <br><p align="center" class="color3">{{message}}</p>
+            <script>
+            (function () {
+            'use strict'
+            var forms = document.querySelectorAll('.needs-validation')
+            Array.prototype.slice.call(forms)
+                .forEach(function (form) {
+                    form.addEventListener('submit', function (event) {
+                    if (!form.checkValidity()) {
+                        event.preventDefault()
+                        event.stopPropagation()
+                    }
+                    form.classList.add('was-validated')
+                    }, false)
+                })
+            })()
+            </script>
 
         </form>
         <br>

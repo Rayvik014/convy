@@ -9,6 +9,7 @@ urlpatterns = [
     path("game/answer", views.answer, name="answer"),
     path("login/", views.my_login, name="login"),
     path("logout/", views.my_logout, name="logout"),
-    path("registration/", views.registration, name="registration")
+    path("registration/", views.registration, name="registration"),
+    path("registration/reg_button", views.registration, name="reg_button")
 
 ]
