@@ -1,6 +1,7 @@
 from django.contrib.auth.backends import ModelBackend
 from django.contrib.auth.models import User, Group
 from django.contrib.auth import get_user_model, login, logout
+from django.contrib.auth.views import PasswordResetView
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
 from django.urls import reverse
@@ -8,7 +9,7 @@ from .models import Word, Progress
 from .forms import AnswerForm, LoginForm, RegistrationForm
 import random
 
-# There are constants that increase or decrease value of chance to drop the word:
+# There are some constants:
 CORRECTANSWER = 7 # how to decrease chance for next drop with right answer (def Answer)
 INCORRECTANSWER = 7 # how to increase chance for next drop with wrong answer (def Answer)
 CHANCEONSTART = 80 # chance for drop with new words creates (inverted value is percent of learning)
@@ -248,3 +249,15 @@ def registration(request):
     form = RegistrationForm()
     return render(request, 'registration/registration.html', {'form': form,
                                                               'message':message})
+
+class MyPasswordResetView(PasswordResetView):
+    def __init__(self, *args, **kwargs):
+        super(MyPasswordResetView, self).__init__(*args, **kwargs)
+        self.correct_form_data()
+
+    def correct_form_data(self, request):
+        my_form = MyPasswordResetView(request.POST)
+        user_email = my_form.cleaned_data['user_email']
+        MyPasswordResetView.email = user_email
+
+
