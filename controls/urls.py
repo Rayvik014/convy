@@ -1,6 +1,6 @@
 from django.urls import path
 from . import views
-from .views import MyPasswordResetView
+from .forms import MyPasswordResetForm
 
 urlpatterns = [
     path("game/", views.game, name="game"),
@@ -12,5 +12,5 @@ urlpatterns = [
     path("logout/", views.my_logout, name="logout"),
     path("registration/", views.registration, name="registration"),
     path("registration/reg_button", views.registration, name="reg_button"),
-    path('password-reset/', MyPasswordResetView().as_view(template_name='users/password_reset.html'),name='password-reset'),
+    path("accounts/password_reset/", views.MyPasswordResetView.as_view(form_class=MyPasswordResetForm), name="password_reset"),
 ]
