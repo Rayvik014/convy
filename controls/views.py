@@ -1,12 +1,13 @@
 from django.contrib.auth.backends import ModelBackend
 from django.contrib.auth.models import User, Group
-from django.contrib.auth.views import PasswordResetView, PasswordResetConfirmView
+from django.contrib.auth.views import PasswordResetView
 from django.contrib.auth import get_user_model, login, logout
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
 from django.urls import reverse
+
 from .models import Word, Progress
-from .forms import AnswerForm, LoginForm, RegistrationForm, MyPasswordResetForm, NewPasswordForm
+from .forms import AnswerForm, LoginForm, RegistrationForm, MyPasswordResetForm
 import random
 
 # There are some constants:
@@ -283,20 +284,3 @@ class MyPasswordResetView(PasswordResetView):
             return HttpResponseRedirect('password_reset_done')
         return super().form_valid(form)
 
-def MyPasswordResetConfirmView(request):
-    message = request.GET.get('message', '')
-    if request.method == 'POST':
-        form = RegistrationForm(request.POST)
-        if form.is_valid():
-            user_password_1 = form.cleaned_data['user_password_1']
-            user_password_2 = form.cleaned_data['user_password_2']
-            if user_password_1 != user_password_2:
-                message = "Пароли не совпадают, попробуйте еще раз"
-                return HttpResponseRedirect(reverse('password_reset_confirm'), args=["<uidb64>", "<token>"])
-            elif user_password_1 < 6:
-                message = "Пароль не может быть менее 6 символов"
-                return HttpResponseRedirect(reverse('password_reset_confirm'), args=["<uidb64>", "<token>"])
-            else:
-                return HttpResponseRedirect('password_reset_complete')
-        return HttpResponseRedirect(reverse('password_reset_confirm'), args=["<uidb64>", "<token>"])
-    return HttpResponseRedirect(reverse('password_reset_confirm'), args=["<uidb64>", "<token>"])

@@ -17,10 +17,6 @@ class RegistrationForm(forms.Form):
     user_password_1 = forms.CharField(min_length=6, max_length=50)
     user_password_2 = forms.CharField(min_length=6, max_length=50)
 
-class NewPasswordForm(forms.Form):
-    user_password_1 = forms.CharField(min_length=6, max_length=50)
-    user_password_2 = forms.CharField(min_length=6, max_length=50)
-
 class MyPasswordResetForm(PasswordResetForm):
     email = forms.EmailField(required=True, max_length=254)
 
