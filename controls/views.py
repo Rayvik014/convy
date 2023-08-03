@@ -11,12 +11,13 @@ from .forms import AnswerForm, LoginForm, RegistrationForm, MyPasswordResetForm
 import random
 
 # There are some constants:
-CORRECTANSWER = 7  # how to decrease chance for next drop with right answer (def Answer)
-INCORRECTANSWER = 7  # how to increase chance for next drop with wrong answer (def Answer)
-CHANCEONSTART = 80  # chance for drop with new words creates (inverted value is percent of learning)
+CORRECT_ANSWER = 7  # how to decrease chance for next drop with right answer (def Answer)
+INCORRECT_ANSWER = 7  # how to increase chance for next drop with wrong answer (def Answer)
+CHANCE_ON_START = 80  # chance for drop with new words creates (inverted value is percent of learning)
 
 
 def index(request):
+    """Controls render of main page"""
     user_id = request.user.id
     message_auth = request.GET.get('message-auth', '')
     words_in_dict = str(Progress.objects.filter(user_id=user_id).count()) + "/" + str(Word.objects.count())
@@ -47,7 +48,7 @@ def button_plus_word(user_id, count_of_words):
             random_pick = random.choice(word_ids_list)  # Choose random word ID
             if random_pick not in user_words:
                 p = Progress(user_id=user_id, word_id=random_pick,
-                             chance=CHANCEONSTART)  # Write the new string in database
+                             chance=CHANCE_ON_START)  # Write the new string in database
                 p.save()
                 word_obj = Word.objects.get(pk=random_pick)
                 message2 += f"Добавлено слово: {word_obj.lang1}/{word_obj.lang2}\n"
@@ -60,20 +61,22 @@ def button_plus_word(user_id, count_of_words):
     return message
 
 
-def inverse_percentage(percent: int):
-    return (-1) * percent + 101
-
-
 def button_plus_one(request):
+    """Action fo button '+1 word'"""
     user_id = request.user.id
     message = button_plus_word(user_id, 1)
     return HttpResponseRedirect(reverse('game') + '?message-from-button=' + message)
 
 
 def button_plus_ten(request):
+    """Action fo button '+10 words'"""
     user_id = request.user.id
     message = button_plus_word(user_id, 10)
     return HttpResponseRedirect(reverse('game') + '?message-from-button=' + message)
+
+
+def inverse_percentage(percent: int):
+    return (-1) * percent + 101
 
 
 def game(request):
@@ -175,11 +178,11 @@ def answer(request):
             offered_id = form.cleaned_data['offered_id']
             progress = Progress.objects.get(word_id=offered_id)
             if the_answer == offered_answer:  # decrease chance value if the answer is correct
-                progress.chance = chance_change(False, CORRECTANSWER, progress.chance)
+                progress.chance = chance_change(False, CORRECT_ANSWER, progress.chance)
                 progress.save(update_fields=["chance"])
                 mess = "Верно!"
             else:  # increase chance value if the answer is incorrect
-                progress.chance = chance_change(True, INCORRECTANSWER, progress.chance)
+                progress.chance = chance_change(True, INCORRECT_ANSWER, progress.chance)
                 progress.save(update_fields=["chance"])
                 mess = f"Неправильно! Ответ: {offered_answer}"
         return HttpResponseRedirect(reverse('game') + '?message-from-answer=' + mess)
